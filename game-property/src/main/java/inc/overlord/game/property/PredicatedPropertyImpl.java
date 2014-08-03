@@ -15,6 +15,7 @@ import lombok.Getter;
  *
  * @author achelian
  * @param <T>
+ * @param <P>
  */
 @EqualsAndHashCode(callSuper = true)
 public class PredicatedPropertyImpl<T, P extends Predicate<T>> extends PropertyImpl<T> implements PredicatedProperty<T, P> {

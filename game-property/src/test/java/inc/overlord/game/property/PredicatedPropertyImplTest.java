@@ -9,6 +9,9 @@ package inc.overlord.game.property;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
+import static java.util.Collections.singleton;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Predicate;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -160,5 +163,30 @@ public class PredicatedPropertyImplTest {
     property.validate();
     property.vetoableChange(new PropertyChangeEvent(this, "nothing", null, 5));
     verifyZeroInteractions(listener);
+  }
+
+  @Test
+  public void testEqualsAndHashCode() {
+    SetMatchingPredicate<String> predicate = new SetMatchingPredicate<>();
+    predicate.setMatches(singleton("ha"));
+    predicate.validate();
+    property.setPredicate(predicate);
+    property.setValue("ha");
+    property.validate();
+    SetMatchingPredicate<String> predicate2 = new SetMatchingPredicate<>();
+    predicate2.setMatches(singleton("ha"));
+    predicate2.validate();
+    PredicatedPropertyImpl<String, Predicate<String>> property2 = new PredicatedPropertyImpl<>();
+    property2.setPredicate(predicate2);
+    property2.setValue("ha");
+    property2.validate();
+    assertTrue(property.equals(property2));
+    assertTrue(property2.equals(property));
+    assertEquals(property.hashCode(), property2.hashCode());
+    Set<String> setReplacement = new HashSet<>(predicate.getMatches());
+    setReplacement.add("ho");
+    predicate2.setMatches(setReplacement);
+    assertFalse(property.equals(property2));
+    assertFalse(property2.equals(property));
   }
 }

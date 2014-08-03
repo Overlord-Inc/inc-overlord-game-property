@@ -9,7 +9,6 @@ package inc.overlord.game.property;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.Transient;
-import java.util.function.Predicate;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 

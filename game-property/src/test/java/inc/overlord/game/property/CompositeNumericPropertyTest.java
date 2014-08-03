@@ -9,7 +9,7 @@ package inc.overlord.game.property;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
-import java.util.Arrays;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import java.util.List;
 import static org.junit.Assert.*;
@@ -37,12 +37,13 @@ public class CompositeNumericPropertyTest {
   }
 
   private void initProperty() {
-    properties = Arrays.asList((Property<Integer>) new ConstantProperty<>(5), (Property<Integer>) new ConstantProperty<>(6));
+    properties = asList((Property<Integer>) new ConstantProperty<>(5), (Property<Integer>) new ConstantProperty<>(6));
     property.setComponents(properties);
     property.setAccumulator(BasicIntegerAccumulators.SUM);
     property.addPropertyChangeListener(listener);
     property.validate();
   }
+
   @Test(expected = IllegalStateException.class)
   public void testValidateNullAccumulator() {
     property.validate();
@@ -86,7 +87,7 @@ public class CompositeNumericPropertyTest {
     property.setAccumulator(BasicIntegerAccumulators.SUM);
     property.addPropertyChangeListener(listener);
     property.validate();
-    properties = Arrays.asList((Property<Integer>) new ConstantProperty<>(5), (Property<Integer>) new ConstantProperty<>(6));
+    properties = asList((Property<Integer>) new ConstantProperty<>(5), (Property<Integer>) new ConstantProperty<>(6));
     property.setComponents(properties);
     assertEquals(properties, property.getComponents());
     verify(listener).propertyChange(argThat(new PropertyChangeEvtGenericMatcher("components", emptyList(), properties)));
@@ -168,5 +169,21 @@ public class CompositeNumericPropertyTest {
     property.setAccumulator(BasicIntegerAccumulators.SUM);
     property.components = null;
     property.validate();
+  }
+
+  @Test
+  public void testEqualsAndHashCode() {
+    initProperty();
+    CompositeNumericProperty<Integer> property2 = new CompositeNumericProperty<>();
+    List<Property<Integer>> properties2 = asList(new ConstantProperty<Integer>(5), new ConstantProperty<Integer>(6));
+    property2.setComponents(properties2);
+    property2.setAccumulator(BasicIntegerAccumulators.SUM);
+    property2.validate();
+    assertTrue(property.equals(property2));
+    assertTrue(property2.equals(property));
+    assertEquals(property.hashCode(), property2.hashCode());
+    property2.setComponents(asList(new ConstantProperty<Integer>(6), new ConstantProperty<Integer>(5)));
+    assertFalse(property.equals(property2));
+    assertFalse(property2.equals(property));
   }
 }

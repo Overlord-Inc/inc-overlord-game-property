@@ -80,4 +80,19 @@ public class PropertyImplTest {
     property.vetoableChange(new PropertyChangeEvent(this, "something", null, "foo"));
     verifyZeroInteractions(listener);
   }
+
+  @Test
+  public void testEqualsAndHashCode() {
+    property.setValue("ha");
+    property.validate();
+    PropertyImpl<String> property2 = new PropertyImpl<>();
+    property2.setValue("ha");
+    property2.validate();
+    assertTrue(property.equals(property2));
+    assertTrue(property2.equals(property));
+    assertEquals(property.hashCode(), property2.hashCode());
+    property2.setValue("ho");
+    assertFalse(property.equals(property2));
+    assertFalse(property2.equals(property));
+  }
 }

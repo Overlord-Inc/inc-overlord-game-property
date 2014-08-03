@@ -35,6 +35,7 @@ public class RangeMaskedNumericPropertyTest {
 
   private void initProperty() {
     range = new RangePredicate<>(0, 10);
+    range.validate();
     property.setPredicate(range);
     property.setValue(5);
     property.addPropertyChangeListener(listener);
@@ -206,5 +207,22 @@ public class RangeMaskedNumericPropertyTest {
   public void testVetoableChangeNothingDoesNothing() throws PropertyVetoException {
     initProperty();
     property.vetoableChange(new PropertyChangeEvent(this, "nothing", null, 5));
+  }
+
+  @Test
+  public void testEqualsAndHashCode() {
+    initProperty();
+    RangeMaskedNumericProperty<Integer> property2 = new RangeMaskedNumericProperty<>();
+    RangePredicate<Integer> range2 = new RangePredicate<>(0, 10);
+    range2.validate();
+    property2.setPredicate(range2);
+    property2.setValue(5);
+    property2.validate();
+    assertTrue(property.equals(property2));
+    assertTrue(property2.equals(property));
+    assertEquals(property.hashCode(), property2.hashCode());
+    range2.setMax(8);
+    assertFalse(property.equals(property2));
+    assertFalse(property2.equals(property));
   }
 }
