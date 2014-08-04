@@ -22,21 +22,21 @@ import static org.mockito.MockitoAnnotations.initMocks;
  *
  * @author achelian
  */
-public class RangeMaskedNumericPropertyTest {
-  RangeMaskedNumericProperty<Integer> property;
-  RangePredicate<Integer> range;
+public class RangeConstrainedNumericPropertyTest {
+  RangeConstrainedNumericProperty<Integer> property;
+  Range<Integer> range;
   @Mock PropertyChangeListener listener;
 
   @Before
   public void setUp() {
     initMocks(this);
-    property = new RangeMaskedNumericProperty<>();
+    property = new RangeConstrainedNumericProperty<>();
   }
 
   private void initProperty() {
-    range = new RangePredicate<>(0, 10);
+    range = new Range<>(0, 10);
     range.validate();
-    property.setPredicate(range);
+    property.setConstraint(range);
     property.setValue(5);
     property.addPropertyChangeListener(listener);
     property.validate();
@@ -49,9 +49,9 @@ public class RangeMaskedNumericPropertyTest {
 
   @Test(expected = IllegalStateException.class)
   public void testValidateNullValue() {
-    range = new RangePredicate<>(0, 10);
+    range = new Range<>(0, 10);
     range.validate();
-    property.setPredicate(range);
+    property.setConstraint(range);
     property.validate();
   }
 
@@ -63,13 +63,13 @@ public class RangeMaskedNumericPropertyTest {
 
   @Test
   public void testValidateHappyCase() {
-    range = new RangePredicate<>(0, 10);
+    range = new Range<>(0, 10);
     range.validate();
     property.setValue(7);
-    property.setPredicate(range);
+    property.setConstraint(range);
     property.validate();
     assertEquals(7, (int) property.getValue());
-    assertSame(range, property.getPredicate());
+    assertSame(range, property.getConstraint());
   }
 
   @Test
@@ -99,81 +99,81 @@ public class RangeMaskedNumericPropertyTest {
   @Test
   public void testSetPredicateHappyCase() {
     initProperty();
-    RangePredicate<Integer> replacement = new RangePredicate<>(3, 7);
-    property.setPredicate(replacement);
+    Range<Integer> replacement = new Range<>(3, 7);
+    property.setConstraint(replacement);
     assertEquals(5, (int) property.getValue());
-    assertSame(replacement, property.getPredicate());
-    verify(listener).propertyChange(argThat(new PropertyChangeEvtGenericMatcher("predicate", range, replacement)));
+    assertSame(replacement, property.getConstraint());
+    verify(listener).propertyChange(argThat(new PropertyChangeEvtGenericMatcher("constraint", range, replacement)));
   }
 
   @Test(expected = NullPointerException.class)
   public void testSetPredicateNullThrows() {
     initProperty();
-    property.setPredicate(null);
+    property.setConstraint(null);
   }
 
   @Test
   public void testSetPredicateMaskHigh() {
     initProperty();
-    RangePredicate<Integer> replacement = new RangePredicate<>(7, 10);
+    Range<Integer> replacement = new Range<>(7, 10);
     replacement.validate();
-    property.setPredicate(replacement);
-    verify(listener).propertyChange(argThat(new PropertyChangeEvtGenericMatcher("predicate", range, replacement)));
+    property.setConstraint(replacement);
+    verify(listener).propertyChange(argThat(new PropertyChangeEvtGenericMatcher("constraint", range, replacement)));
     verify(listener).propertyChange(argThat(new PropertyChangeEvtGenericMatcher("value", 5, 7)));
   }
 
   @Test
   public void testSetPredicateMaskLow() {
     initProperty();
-    RangePredicate<Integer> replacement = new RangePredicate<>(0, 3);
+    Range<Integer> replacement = new Range<>(0, 3);
     replacement.validate();
-    property.setPredicate(replacement);
-    verify(listener).propertyChange(argThat(new PropertyChangeEvtGenericMatcher("predicate", range, replacement)));
+    property.setConstraint(replacement);
+    verify(listener).propertyChange(argThat(new PropertyChangeEvtGenericMatcher("constraint", range, replacement)));
     verify(listener).propertyChange(argThat(new PropertyChangeEvtGenericMatcher("value", 5, 3)));
   }
 
   @Test
   public void testVetoableChangePredicateNoChange() throws PropertyVetoException {
     initProperty();
-    RangePredicate<Integer> replacement = new RangePredicate<>(3, 7);
+    Range<Integer> replacement = new Range<>(3, 7);
     replacement.validate();
-    property.vetoableChange(new PropertyChangeEvent(this, "predicate", range, replacement));
+    property.vetoableChange(new PropertyChangeEvent(this, "constraint", range, replacement));
     assertEquals(5, (int) property.getValue());
-    verify(listener).propertyChange(argThat(new PropertyChangeEvtGenericMatcher("predicate", range, replacement)));
+    verify(listener).propertyChange(argThat(new PropertyChangeEvtGenericMatcher("constraint", range, replacement)));
   }
 
   @Test
   public void testVetoableChangePredicateMasksLow() throws PropertyVetoException {
     initProperty();
-    RangePredicate<Integer> replacement = new RangePredicate<>(0, 3);
+    Range<Integer> replacement = new Range<>(0, 3);
     replacement.validate();
-    property.vetoableChange(new PropertyChangeEvent(this, "predicate", range, replacement));
+    property.vetoableChange(new PropertyChangeEvent(this, "constraint", range, replacement));
     assertEquals(3, (int) property.getValue());
-    verify(listener).propertyChange(argThat(new PropertyChangeEvtGenericMatcher("predicate", range, replacement)));
+    verify(listener).propertyChange(argThat(new PropertyChangeEvtGenericMatcher("constraint", range, replacement)));
     verify(listener).propertyChange(argThat(new PropertyChangeEvtGenericMatcher("value", 5, 3)));
   }
 
   @Test
   public void testVetoableChangePredicateMasksHigh() throws PropertyVetoException {
     initProperty();
-    RangePredicate<Integer> replacement = new RangePredicate<>(7, 10);
+    Range<Integer> replacement = new Range<>(7, 10);
     replacement.validate();
-    property.vetoableChange(new PropertyChangeEvent(this, "predicate", range, replacement));
+    property.vetoableChange(new PropertyChangeEvent(this, "constraint", range, replacement));
     assertEquals(7, (int) property.getValue());
-    verify(listener).propertyChange(argThat(new PropertyChangeEvtGenericMatcher("predicate", range, replacement)));
+    verify(listener).propertyChange(argThat(new PropertyChangeEvtGenericMatcher("constraint", range, replacement)));
     verify(listener).propertyChange(argThat(new PropertyChangeEvtGenericMatcher("value", 5, 7)));
   }
 
   @Test(expected = PropertyVetoException.class)
   public void testVetoableChangePredicateNullThrows() throws PropertyVetoException {
     initProperty();
-    property.vetoableChange(new PropertyChangeEvent(this, "predicate", range, null));
+    property.vetoableChange(new PropertyChangeEvent(this, "constraint", range, null));
   }
 
   @Test(expected = PropertyVetoException.class)
   public void testVetoableChangePredicateNonRangePredicateThrows() throws PropertyVetoException {
     initProperty();
-    property.vetoableChange(new PropertyChangeEvent(this, "predicate", range, new NonNullPredicate()));
+    property.vetoableChange(new PropertyChangeEvent(this, "constraint", range, new NonNullPredicate()));
   }
 
   @Test
@@ -212,10 +212,10 @@ public class RangeMaskedNumericPropertyTest {
   @Test
   public void testEqualsAndHashCode() {
     initProperty();
-    RangeMaskedNumericProperty<Integer> property2 = new RangeMaskedNumericProperty<>();
-    RangePredicate<Integer> range2 = new RangePredicate<>(0, 10);
+    RangeConstrainedNumericProperty<Integer> property2 = new RangeConstrainedNumericProperty<>();
+    Range<Integer> range2 = new Range<>(0, 10);
     range2.validate();
-    property2.setPredicate(range2);
+    property2.setConstraint(range2);
     property2.setValue(5);
     property2.validate();
     assertTrue(property.equals(property2));

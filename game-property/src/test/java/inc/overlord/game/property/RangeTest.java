@@ -23,14 +23,14 @@ import static org.mockito.MockitoAnnotations.initMocks;
  *
  * @author achelian
  */
-public class RangePredicateTest {
-  RangePredicate<Integer> predicate;
+public class RangeTest {
+  Range<Integer> predicate;
   @Mock PropertyChangeListener listener;
 
   @Before
   public void setUp() {
     initMocks(this);
-    predicate = new RangePredicate<>();
+    predicate = new Range<>();
   }
 
   public void initPredicate() {

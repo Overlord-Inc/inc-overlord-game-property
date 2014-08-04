@@ -25,7 +25,7 @@ import lombok.NonNull;
  */
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false, exclude = {"propertyChangeSupport"})
-public class RangePredicate<T extends Comparable> implements Predicate<T>, VetoableChangeListener {
+public class Range<T extends Comparable> implements Predicate<T>, Constraint<T>, VetoableChangeListener {
   @Delegate
   final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
   @Getter
@@ -34,7 +34,7 @@ public class RangePredicate<T extends Comparable> implements Predicate<T>, Vetoa
   boolean creationMode = true;
 
   @SuppressWarnings("OverridableMethodCallInConstructor")
-  public RangePredicate(T min, T max) {
+  public Range(T min, T max) {
     this.min = min;
     this.max = max;
   }
@@ -67,7 +67,8 @@ public class RangePredicate<T extends Comparable> implements Predicate<T>, Vetoa
     }
   }
 
-  public T trim(@NonNull T value) {
+  @Override
+  public T constrain(@NonNull T value) {
     if (value.compareTo(max) > 0) {
       return max;
     }
@@ -125,10 +126,7 @@ public class RangePredicate<T extends Comparable> implements Predicate<T>, Vetoa
     if (t == null) {
       return false;
     }
-    if (t.compareTo(max) > 0 || t.compareTo(min) < 0) {
-      return false;
-    }
-    return true;
+    return t.compareTo(max) <= 0 && t.compareTo(min) >= 0;
   }
   
 }

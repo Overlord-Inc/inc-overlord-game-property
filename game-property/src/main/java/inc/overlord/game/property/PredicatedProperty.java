@@ -11,7 +11,7 @@ import java.beans.PropertyVetoException;
 import java.util.function.Predicate;
 
 /**
- *
+ * Imposes a predicate on the input of a value.
  * @author achelian
  * @param <T>
  * @param <P>
@@ -29,13 +29,8 @@ public interface PredicatedProperty<T, P extends Predicate<T>> extends Property<
     if (getPredicate() == null) {
       throw new IllegalStateException("predicate cannot be null");
     }
-    try {
-      if (!getPredicate().test(getValue())) {
-        throw new IllegalStateException("value does not pass predicate");
-      }
-    }
-    catch (NullPointerException e) {
-      throw new IllegalStateException("value cannot be null");
+    if (!getPredicate().test(getValue())) {
+      throw new IllegalStateException("value does not pass predicate");
     }
   }
 

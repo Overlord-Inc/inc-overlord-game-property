@@ -24,7 +24,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
  */
 public class RangeCoercedNumericPropertyTest {
   RangeCoercedNumericProperty<Integer> property;
-  RangePredicate<Integer> range;
+  Range<Integer> range;
 
   @Mock PropertyChangeListener listener;
 
@@ -32,7 +32,7 @@ public class RangeCoercedNumericPropertyTest {
   public void setUp() {
     initMocks(this);
     property = new RangeCoercedNumericProperty<>();
-    range = new RangePredicate<>();
+    range = new Range<>();
     range.setMax(10);
     range.setMin(0);
     range.validate();
@@ -87,7 +87,7 @@ public class RangeCoercedNumericPropertyTest {
   @Test
   public void testSetPredicateNoCoercionHappyCase() {
     property.validate();
-    RangePredicate<Integer> replacementRange = new RangePredicate(3, 7);
+    Range<Integer> replacementRange = new Range(3, 7);
     replacementRange.validate();
     property.setPredicate(replacementRange);
     verify(listener).propertyChange(argThat(new PropertyChangeEvtGenericMatcher("predicate", range, replacementRange)));
@@ -97,7 +97,7 @@ public class RangeCoercedNumericPropertyTest {
   @Test
   public void testSetPredicateCoercionLow() {
     property.validate();
-    RangePredicate<Integer> replacementRange = new RangePredicate(7, 10);
+    Range<Integer> replacementRange = new Range(7, 10);
     replacementRange.validate();
     property.setPredicate(replacementRange);
     verify(listener).propertyChange(argThat(new PropertyChangeEvtGenericMatcher("predicate", range, replacementRange)));
@@ -108,7 +108,7 @@ public class RangeCoercedNumericPropertyTest {
   @Test
   public void testSetPredicateCoercionHigh() {
     property.validate();
-    RangePredicate<Integer> replacementRange = new RangePredicate(0, 3);
+    Range<Integer> replacementRange = new Range(0, 3);
     replacementRange.validate();
     property.setPredicate(replacementRange);
     assertEquals((Integer) 3, property.getValue());
@@ -183,7 +183,7 @@ public class RangeCoercedNumericPropertyTest {
   @Test
   public void testVetoableChangePredicateHappyCase() throws PropertyVetoException {
     property.validate();
-    RangePredicate<Integer> replacement = new RangePredicate(3, 7);
+    Range<Integer> replacement = new Range(3, 7);
     property.vetoableChange(new PropertyChangeEvent(this, "predicate", range, replacement));
     assertEquals((Integer) 5, property.getValue());
     assertSame(replacement, property.getPredicate());
@@ -205,7 +205,7 @@ public class RangeCoercedNumericPropertyTest {
   @Test
   public void testVetoableChangePredicateCoerceLow() throws PropertyVetoException {
     property.validate();
-    RangePredicate<Integer> replacement = new RangePredicate<>(0, 3);
+    Range<Integer> replacement = new Range<>(0, 3);
     replacement.validate();    
     property.vetoableChange(new PropertyChangeEvent(this, "predicate", range, replacement));
     assertEquals((Integer) 3, property.getValue());
@@ -217,7 +217,7 @@ public class RangeCoercedNumericPropertyTest {
   @Test
   public void testVetoableChangePredicateCoerceHigh() throws PropertyVetoException {
     property.validate();
-    RangePredicate<Integer> replacement = new RangePredicate<>(7, 10);
+    Range<Integer> replacement = new Range<>(7, 10);
     replacement.validate();    
     property.vetoableChange(new PropertyChangeEvent(this, "predicate", range, replacement));
     assertEquals((Integer) 7, property.getValue());

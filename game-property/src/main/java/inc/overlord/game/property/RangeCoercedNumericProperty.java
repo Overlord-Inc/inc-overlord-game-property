@@ -18,18 +18,18 @@ import lombok.NonNull;
  * @author achelian
  * @param <T> A java numeric type.
  */
-public class RangeCoercedNumericProperty<T extends Number & Comparable> extends PredicatedPropertyImpl<T, RangePredicate<T>> implements PropertyChangeListener {
+public class RangeCoercedNumericProperty<T extends Number & Comparable> extends PredicatedPropertyImpl<T, Range<T>> implements PropertyChangeListener {
   @Override
-  public void setPredicate(@NonNull RangePredicate<T> value) {
-    RangePredicate<T> oldPredicate = predicate;
+  public void setPredicate(@NonNull Range<T> value) {
+    Range<T> oldPredicate = predicate;
     if (oldPredicate != null) {
-      ((RangePredicate<T>) oldPredicate).removePropertyChangeListener(this);
+      ((Range<T>) oldPredicate).removePropertyChangeListener(this);
     }
     predicate = value;
     value.addPropertyChangeListener(this);
     if (!creationMode) {
       firePropertyChange("predicate", oldPredicate, value);
-      setValue(value.trim(this.value));
+      setValue(value.constrain(this.value));
     }
   }
 
@@ -38,8 +38,8 @@ public class RangeCoercedNumericProperty<T extends Number & Comparable> extends 
   public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
     switch (evt.getPropertyName()) {
       case "predicate": {
-        if (RangePredicate.class.isInstance(evt.getNewValue())) {
-          RangePredicate<T> rangePredicate = RangePredicate.class.cast(evt.getNewValue());
+        if (Range.class.isInstance(evt.getNewValue())) {
+          Range<T> rangePredicate = Range.class.cast(evt.getNewValue());
           setPredicate(rangePredicate);
         }
         else {
@@ -64,7 +64,7 @@ public class RangeCoercedNumericProperty<T extends Number & Comparable> extends 
   @Override
   public void validate() {
     if (value != null && predicate != null) {
-      value = predicate.trim(value);
+      value = predicate.constrain(value);
     }
     super.validate();
   }
